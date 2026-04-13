@@ -1,7 +1,6 @@
-streamlit
-streamlit-webrtc
+opencv-python
+mediapipe
 numpy
 pandas
 scikit-learn
 joblib
-mediapipe==0.10.33
