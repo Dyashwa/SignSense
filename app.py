@@ -1,46 +1,19 @@
 import streamlit as st
-import cv2
-import mediapipe as mp
 import joblib
+import numpy as np
 
 st.title("🤟 Sign Language Detector")
 
+st.write("⚠️ Webcam is not supported in cloud deployment.")
+st.write("This is a demo version of the model.")
+
 model = joblib.load("asl_model.pkl")
 
-mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(max_num_hands=1)
+st.subheader("Test Model with Dummy Input")
 
-run = st.checkbox("Start Camera")
+# create random input (since no camera)
+dummy_input = np.random.rand(1, 42)
 
-FRAME_WINDOW = st.image([])
-
-cap = cv2.VideoCapture(0)
-
-while run:
-    ret, frame = cap.read()
-    if not ret:
-        st.write("Camera error")
-        break
-
-    frame = cv2.flip(frame, 1)
-    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-    result = hands.process(rgb)
-
-    letter = "No Hand"
-
-    if result.multi_hand_landmarks:
-        for hand_landmarks in result.multi_hand_landmarks:
-            features = []
-            for lm in hand_landmarks.landmark:
-                features.extend([lm.x, lm.y])
-
-            prediction = model.predict([features])
-            letter = prediction[0]
-
-    cv2.putText(frame, f"{letter}", (50, 50),
-                cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,255,0), 3)
-
-    FRAME_WINDOW.image(frame)
-
-cap.release()
+if st.button("Predict"):
+    prediction = model.predict(dummy_input)
+    st.success(f"Predicted Letter: {prediction[0]}")
